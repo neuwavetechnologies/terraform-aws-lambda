@@ -691,22 +691,23 @@ class BuildPlanManager:
             runtime = query.runtime
             
             # Try to find the Python interpreter
-            python_cmd = shutil.which(runtime)
+            python3_string = "python3"
+            python_cmd = shutil.which(python3_string)
             
-            # If exact runtime name not found, try using python3
-            if not python_cmd and runtime.startswith("python"):
-                python3_cmd = shutil.which("python3")
-                if python3_cmd:
-                    # Verify the version matches what we need
-                    try:
-                        version_output = subprocess.check_output([python3_cmd, "--version"], 
-                                                                universal_newlines=True)
-                        # Extract version from output (e.g., "Python 3.13.0")
-                        if runtime.replace("python", "") in version_output:
-                            python_cmd = python3_cmd
-                            runtime = "python3"  # Use python3 instead
-                    except:
-                        pass  # If verification fails, continue with original approach
+            # # If exact runtime name not found, try using python3
+            # if not python_cmd and runtime.startswith("python"):
+            #     python3_cmd = shutil.which("python3")
+            #     if python3_cmd:
+            #         # Verify the version matches what we need
+            #         try:
+            #             version_output = subprocess.check_output([python3_cmd, "--version"], 
+            #                                                     universal_newlines=True)
+            #             # Extract version from output (e.g., "Python 3.13.0")
+            #             if runtime.replace("python", "") in version_output:
+            #                 python_cmd = python3_cmd
+            #                 runtime = "python3"  # Use python3 instead
+            #         except:
+            #             pass  # If verification fails, continue with original approach
             
             requirements = path
             if os.path.isdir(path):
