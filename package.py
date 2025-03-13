@@ -720,6 +720,8 @@ class BuildPlanManager:
                 if not query.docker and not shutil.which(command):
                     shutiloutput = shutil.which(command)
                     raise RuntimeError(
+                        f"command:{command}",
+                        f"shutil.which(command):{shutil.which(command)}",
                         f"shutiloutput:{shutiloutput}",
                         "Python interpreter version equal "
                         "to defined lambda runtime ({}) should be "
