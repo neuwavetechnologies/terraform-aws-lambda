@@ -722,6 +722,7 @@ class BuildPlanManager:
                     raise RuntimeError(
                         f"command:{command}",
                         f"shutil.which(command):{shutil.which(command)}",
+                        f"shutil.which(python):{shutil.which("python")}",
                         f"shutil.which(python3):{shutil.which("python3")}",
                         f"shutiloutput:{shutiloutput}",
                         "Python interpreter version equal "
