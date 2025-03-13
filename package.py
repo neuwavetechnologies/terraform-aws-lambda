@@ -692,6 +692,7 @@ class BuildPlanManager:
             # Let's make it more flexible
             command = runtime
             python_cmd = shutil.which(command)
+            print(f"python_cmd: {python_cmd}")
             
             # If exact runtime name not found, try using python3
             if not python_cmd and runtime.startswith("python"):
