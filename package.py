@@ -1077,6 +1077,7 @@ def install_pip_requirements(query, requirements_file, tmp_dir):
         return
 
     runtime = query.runtime
+
     artifacts_dir = query.artifacts_dir
     docker = query.docker
     temp_dir = query.temp_dir
@@ -1119,7 +1120,7 @@ def install_pip_requirements(query, requirements_file, tmp_dir):
         target_file = os.path.join(temp_dir, requirements_filename)
         shutil.copyfile(requirements_file, target_file)
 
-        python_exec = runtime
+        python_exec = "python3"
         subproc_env = None
 
         if not docker:
