@@ -688,25 +688,23 @@ class BuildPlanManager:
             source_paths.append(path)
 
         def pip_requirements_step(path, prefix=None, required=False, tmp_dir=None):
-            print(f"runtime: {runtime}")
-            print(f"path: {path}")
-            # Original code uses: command = runtime
-            # Let's make it more flexible
-            command = runtime
-            python_cmd = shutil.which(command)
-            print(f"python_cmd: {python_cmd}")
+            runtime = query.runtime
+            
+            # Try to find the Python interpreter
+            python_cmd = shutil.which(runtime)
             
             # If exact runtime name not found, try using python3
             if not python_cmd and runtime.startswith("python"):
-                python_cmd = shutil.which("python3")
-                if python_cmd:
+                python3_cmd = shutil.which("python3")
+                if python3_cmd:
                     # Verify the version matches what we need
                     try:
-                        version_output = subprocess.check_output([python_cmd, "--version"], 
+                        version_output = subprocess.check_output([python3_cmd, "--version"], 
                                                                 universal_newlines=True)
                         # Extract version from output (e.g., "Python 3.13.0")
                         if runtime.replace("python", "") in version_output:
-                            command = "python3"  # Use python3 instead
+                            python_cmd = python3_cmd
+                            runtime = "python3"  # Use python3 instead
                     except:
                         pass  # If verification fails, continue with original approach
             
@@ -717,22 +715,14 @@ class BuildPlanManager:
                 if required:
                     raise RuntimeError("File not found: {}".format(requirements))
             else:
-                if not query.docker and not shutil.which(command):
-                    shutiloutput = shutil.which(command)
-                    python_string = "python"
-                    python3_string = "python3"
+                if not query.docker and not python_cmd:
+                    available_python = shutil.which("python3") or shutil.which("python")
                     raise RuntimeError(
-                        f"command:{command}",
-                        f"shutil.which(command):{shutil.which(command)}",
-                        f"shutil.which(python):{shutil.which(python_string)}",
-                        f"shutil.which(python3):{shutil.which(python3_string)}",
-                        f"shutiloutput:{shutiloutput}",
-                        "Python interpreter version equal "
-                        "to defined lambda runtime ({}) should be "
-                        "available in system PATH".format(runtime)
+                        f"Python interpreter version equal to defined lambda runtime ({runtime}) "
+                        f"not found. Available Python: {available_python}"
                     )
-        
-                step("pip", command, requirements, prefix, tmp_dir)
+
+                step("pip", runtime, requirements, prefix, tmp_dir)
                 hash(requirements)
 
         def poetry_install_step(
