@@ -688,7 +688,25 @@ class BuildPlanManager:
             source_paths.append(path)
 
         def pip_requirements_step(path, prefix=None, required=False, tmp_dir=None):
+            # Original code uses: command = runtime
+            # Let's make it more flexible
             command = runtime
+            python_cmd = shutil.which(command)
+            
+            # If exact runtime name not found, try using python3
+            if not python_cmd and runtime.startswith("python"):
+                python_cmd = shutil.which("python3")
+                if python_cmd:
+                    # Verify the version matches what we need
+                    try:
+                        version_output = subprocess.check_output([python_cmd, "--version"], 
+                                                                universal_newlines=True)
+                        # Extract version from output (e.g., "Python 3.13.0")
+                        if runtime.replace("python", "") in version_output:
+                            command = "python3"  # Use python3 instead
+                    except:
+                        pass  # If verification fails, continue with original approach
+            
             requirements = path
             if os.path.isdir(path):
                 requirements = os.path.join(path, "requirements.txt")
@@ -700,10 +718,10 @@ class BuildPlanManager:
                     raise RuntimeError(
                         "Python interpreter version equal "
                         "to defined lambda runtime ({}) should be "
-                        "available in system PATH".format(command)
+                        "available in system PATH".format(runtime)
                     )
-
-                step("pip", runtime, requirements, prefix, tmp_dir)
+        
+                step("pip", command, requirements, prefix, tmp_dir)
                 hash(requirements)
 
         def poetry_install_step(
