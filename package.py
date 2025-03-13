@@ -688,6 +688,8 @@ class BuildPlanManager:
             source_paths.append(path)
 
         def pip_requirements_step(path, prefix=None, required=False, tmp_dir=None):
+            print(f"runtime: {runtime}")
+            print(f"path: {path}")
             # Original code uses: command = runtime
             # Let's make it more flexible
             command = runtime
@@ -716,7 +718,9 @@ class BuildPlanManager:
                     raise RuntimeError("File not found: {}".format(requirements))
             else:
                 if not query.docker and not shutil.which(command):
+                    shutiloutput = shutil.which(command)
                     raise RuntimeError(
+                        f"shutiloutput:{shutiloutput}",
                         "Python interpreter version equal "
                         "to defined lambda runtime ({}) should be "
                         "available in system PATH".format(runtime)
